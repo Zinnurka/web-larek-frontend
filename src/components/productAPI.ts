@@ -4,7 +4,6 @@ import { data } from 'autoprefixer';
 const product = '/product'
 interface IProductAPI {
 	getProducts: () => Promise<object>;
-
 }
 
 export class ProductAPI extends Api implements IProductAPI {
