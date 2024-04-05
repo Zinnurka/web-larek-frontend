@@ -1,16 +1,29 @@
-export type EventName = string | RegExp;
-export interface IEvents {
-	on<T extends object>(event: EventName, callback: (data: T) => void): void;
-	emit<T extends object>(event: string, data?: T): void;
-	trigger<T extends object>(event: string, context?: Partial<T>): (data: T) => void;
+export interface IProduct {
+	id: string;
+	description: string;
+	image: string;
+	title: string;
+	category: string;
+	price: number | null;
 }
 
-export interface IModalData {
-	content: HTMLElement;
+export interface IBasket {
+	items: IProduct[];
+	total: number;
 }
 
+export interface IOrder {
+	payment: 'cash' | 'card';
+	email: string;
+	phone: string;
+	address: string;
+	items: string[];
+	total: number;
+}
 
-export interface IFormState {
-	valid: boolean;
-	errors: string[];
+export type OrderForm = Omit<IOrder, 'total' | 'items'>;
+
+export interface IOrderResult {
+	id: string;
+	total: number;
 }
