@@ -9,46 +9,37 @@ interface IPage {
 }
 
 export class Page extends View<IPage> {
-	protected _basket_counter: HTMLElement;
-	protected _gallery: HTMLElement;
-	protected _page_wrapper: HTMLElement;
+	protected _counter: HTMLElement;
+	protected _catalog: HTMLElement;
+	protected _wrapper: HTMLElement;
 	protected _basket: HTMLElement;
 
 	constructor(container: HTMLElement, events: IEvents) {
 		super(container, events);
 
-		this._basket_counter = ensureElement<HTMLElement>('.header__basket-counter');
-		this._gallery = ensureElement<HTMLElement>('.gallery');
-		this._page_wrapper = ensureElement<HTMLElement>('.page__wrapper');
+		this._counter = ensureElement<HTMLElement>('.header__basket-counter');
+		this._catalog = ensureElement<HTMLElement>('.gallery');
+		this._wrapper = ensureElement<HTMLElement>('.page__wrapper');
 		this._basket = ensureElement<HTMLElement>('.header__basket');
 
 		this._basket.addEventListener('click', () => {
 			this.events.emit('basket:open');
 		});
-
-		this.basket_counter = 0;
 	}
 
-	get basket_counter(): number {
-		return +this._basket_counter.textContent;
+	set counter(value: number) {
+		this.setText(this._counter, String(value));
 	}
 
-
-	set basket_counter(value: number) {
-		this.setText(this._basket_counter, String(value));
+	set catalog(items: HTMLElement[]) {
+		this._catalog.replaceChildren(...items);
 	}
 
 	set locked(value: boolean) {
 		if (value) {
-			this._page_wrapper.classList.add('page__wrapper_locked');
+			this._wrapper.classList.add('page__wrapper_locked');
 		} else {
-			this._page_wrapper.classList.remove('page__wrapper_locked');
+			this._wrapper.classList.remove('page__wrapper_locked');
 		}
 	}
-
-	set gallery(items: HTMLElement[]) {
-		this._gallery.replaceChildren(...items);
-	}
-
-
 }

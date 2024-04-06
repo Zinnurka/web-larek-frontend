@@ -1,20 +1,19 @@
 import { IBasket } from '../../types';
-import { createElement } from '../../utils/utils';
+import { cloneTemplate, createElement, ensureElement } from '../../utils/utils';
 import { View } from '../base/Component';
 import { EventEmitter } from '../base/events';
 
 export class Basket extends View<IBasket> {
-	// template: HTMLTemplateElement;
+	static template = ensureElement<HTMLTemplateElement>('#basket');
 	protected _list: HTMLElement;
 	protected _total: HTMLElement;
 	protected _button: HTMLElement;
 
-	constructor(container: HTMLElement, protected events: EventEmitter) {
-		super(container, events);
-
-		this._list = this.container.querySelector('.basket__list');
+	constructor(protected events: EventEmitter) {
+		super(cloneTemplate(Basket.template), events);
 
 		this._total = this.container.querySelector('.basket__price');
+		this._list = ensureElement<HTMLElement>('.basket__list', this.container);
 		this._button = this.container.querySelector('.button');
 
 		if (this._button) {
@@ -24,26 +23,30 @@ export class Basket extends View<IBasket> {
 		}
 
 		this.items = [];
-		this.total = 0;
+	}
+
+	set selected(items: string[]) {
+		if (items.length) {
+			this.setDisabled(this._button, false);
+		} else {
+			this.setDisabled(this._button, true);
+		}
 	}
 
 	set items(items: HTMLElement[]) {
 		if (items.length) {
 			this._list.replaceChildren(...items);
+			this.setDisabled(this._button, false);
 		} else {
 			this._list.replaceChildren(
 				createElement<HTMLParagraphElement>('p', {
-					textContent: 'Выберете продукт',
+					textContent: 'Корзина пуста',
 				})
 			);
+			this.setDisabled(this._button, true);
 		}
 	}
-
 	set total(total: number) {
-		this.setText(this._total, total);
-	}
-
-	get total(): number {
-		return +this._total.textContent;
+		this.setText(this._total, `${total} синапсов`);
 	}
 }
