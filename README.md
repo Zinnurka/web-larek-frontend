@@ -1,3 +1,4 @@
+https://github.com/Zinnurka/web-larek-frontend
 # Проектная работа "Веб-ларек"
 
 Стек: HTML, SCSS, TS, Webpack
