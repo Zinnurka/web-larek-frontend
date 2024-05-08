@@ -13,8 +13,9 @@ import { IProduct } from './types';
 import { API_URL, CDN_URL } from './utils/constants';
 import { cloneTemplate, ensureElement } from './utils/utils';
 
-const events = new EventEmitter();
+const emitter = new EventEmitter();
 const api = new productAPI(CDN_URL, API_URL);
+const container: HTMLElement = document.body
 
 const cardCatalogTemplate = ensureElement<HTMLTemplateElement>('#card-catalog');
 const cardPreviewTemplate = ensureElement<HTMLTemplateElement>('#card-preview');
@@ -23,43 +24,33 @@ const orderTemplate = ensureElement<HTMLTemplateElement>('#order');
 const contactsTemplate = ensureElement<HTMLTemplateElement>('#contacts');
 const successTemplate = ensureElement<HTMLTemplateElement>('#success');
 
-const modalTemplate = ensureElement<HTMLElement>('#modal-container');
+const appData = new AppData(emitter);
 
-const appData = new AppData(events);
-
-const page = new Page(document.body, events);
-const modal = new Modal(modalTemplate, events);
-const basket = new Basket(events);
-const order = new Order(getClonedTemplate(orderTemplate), events);
-const contacts = new Contacts(getClonedTemplate(contactsTemplate), events);
+const modal = new Modal(ensureElement<HTMLElement>('#modal-container'), emitter);
+const basket = new Basket(emitter);
+const order = new Order(getClonedTemplate(orderTemplate), emitter);
+const contacts = new Contacts(getClonedTemplate(contactsTemplate), emitter);
+const page = new Page(container, emitter);
 
 api
 	.getProducts()
 	.then(appData.setItems.bind(appData))
 	.catch((err) => console.log(err));
 
-events.on('modal:open', () => {
-	page.locked = true;
-});
-
-events.on('modal:close', () => {
-	page.locked = false;
-});
-
-events.on('items:change', (items: IProduct[]) => {
+emitter.on('items:change', (items: IProduct[]) => {
 	page.catalog = items.map((item) => {
 		const card = new Card(getClonedTemplate(cardCatalogTemplate), {
-			onClick: () => events.emit('card:select', item),
+			onClick: () => emitter.emit('card:select', item),
 		});
 		return card.render(item);
 	});
 });
 
-events.on('card:select', (item: IProduct) => {
+emitter.on('card:select', (item: IProduct) => {
 	appData.setPreview(item);
 });
 
-events.on('preview:change', (item: IProduct) => {
+emitter.on('preview:change', (item: IProduct) => {
 	const card = new Card(getClonedTemplate(cardPreviewTemplate), {
 		onClick: () => {
 			if (appData.inBasket(item)) {
@@ -76,13 +67,13 @@ events.on('preview:change', (item: IProduct) => {
 	showModal(card.render(item));
 });
 
-events.on('basket:change', handleBasketChange);
+emitter.on('basket:change', handleBasketChange);
 
-events.on('basket:open', () => {
+emitter.on('basket:open', () => {
 	showModal(basket.render());
 });
 
-events.on('order:open', () => {
+emitter.on('order:open', () => {
 	showModal(order.render({
 		payment: 'card',
 		address: '',
@@ -91,12 +82,12 @@ events.on('order:open', () => {
 	}));
 });
 
-events.on(/^order\..*:change/, (data) => handleFormChange(data, order));
-events.on(/^contacts\..*:change/, (data) => handleFormChange(data, contacts));
+emitter.on(/^order\..*:change/, (data) => handleFormChange(data, order));
+emitter.on(/^contacts\..*:change/, (data) => handleFormChange(data, contacts));
 
-events.on('formErrors:change', handleFormErrorsChange);
+emitter.on('formErrors:change', handleFormErrorsChange);
 
-events.on('contacts:submit', () => {
+emitter.on('contacts:submit', () => {
 	api
 		.order(appData.order)
 		.then(() => {
@@ -114,7 +105,7 @@ events.on('contacts:submit', () => {
 		});
 });
 
-events.on('order:submit', () => {
+emitter.on('order:submit', () => {
 	showModal(contacts.render({
 		phone: '',
 		email: '',
@@ -155,3 +146,12 @@ function handleFormErrorsChange(errors: any) {
 	order.valid = !payment && !address;
 	contacts.valid = !email && !phone;
 }
+
+// блокировка и разблокировка прокрутки страницы
+emitter.on('modal:open', () => {
+	page.locked = true;
+});
+
+emitter.on('modal:close', () => {
+	page.locked = false;
+});
