@@ -1,4 +1,4 @@
-import { IBasket, IOrder, IProduct, OrderForm, PaymentMethod } from '../types';
+import { IBasket, IOrder, IProduct, IDeliveryForm, PaymentMethod } from '../types';
 import { IEvents } from './base/events';
 
 export class AppData {
@@ -17,7 +17,7 @@ export class AppData {
 		items: [],
 	};
 
-	formErrors: Partial<Record<keyof OrderForm, string>> = {};
+	formErrors: Partial<Record<keyof IDeliveryForm, string>> = {};
 
 	constructor(protected events: IEvents) {
 	}
@@ -58,7 +58,7 @@ export class AppData {
 		this.order.payment = method;
 	}
 
-	setOrderField(field: keyof OrderForm, value: string) {
+	setOrderField(field: keyof IDeliveryForm, value: string) {
 		if (field === 'payment') {
 			this.setPaymentMethod(value as PaymentMethod);
 		} else {
