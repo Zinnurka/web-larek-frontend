@@ -11,26 +11,14 @@ export class Success extends Component<IOrderResult> {
 
 	constructor(protected container: HTMLFormElement, actions?: ISuccessActions) {
 		super(container);
-
-		this._initializeElements();
-		this._setupEventHandlers(actions);
-	}
-
-	private _initializeElements(): void {
-		this._total = ensureElement<HTMLElement>('.order-success__description', this.container);
-		this._close = ensureElement<HTMLButtonElement>('.order-success__close', this.container);
-	}
-
-	private _setupEventHandlers(actions?: ISuccessActions): void {
-		// Setting up event handlers based on provided actions
-		const eventTarget = this._close || this.container;  // Fallback to container if no close button
+		this._total = this.container.querySelector('.order-success__description');
+		this._close = this.container.querySelector('.order-success__close');
+		const eventTarget = this._close || this.container;
 		if (actions?.onClick) {
 			eventTarget.addEventListener('click', actions.onClick);
 		}
 	}
-
 	set total(value: number) {
-		// Setting the total value in a formatted string
 		this.setText(this._total, `Списано ${value} синапсов`);
 	}
 }
