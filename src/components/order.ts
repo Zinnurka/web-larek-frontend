@@ -1,5 +1,5 @@
 import { Form } from './common/Form';
-import { IDeliveryForm, PaymentMethod } from '../types';
+import { IDeliveryForm } from '../types';
 import { EventEmitter } from './base/events';
 import { ensureElement } from '../utils/utils';
 
@@ -20,12 +20,14 @@ export class Order extends Form<IDeliveryForm> {
 		);
 
 		this._card.addEventListener('click', () => {
-			this.payment = 'card';
+			this._card.classList.add('button_alt-active')
+			this._cash.classList.remove('button_alt-active')
 			this.onInputChange('payment', 'card');
 		});
 
 		this._cash.addEventListener('click', () => {
-			this.payment = 'cash';
+			this._cash.classList.add('button_alt-active')
+			this._card.classList.remove('button_alt-active')
 			this.onInputChange('payment', 'cash');
 		});
 	}
@@ -33,10 +35,5 @@ export class Order extends Form<IDeliveryForm> {
 	set address(value: string) {
 		(this.container.elements.namedItem('address') as HTMLInputElement).value =
 			value;
-	}
-
-	set payment(value: PaymentMethod) {
-		this._card.classList.toggle('button_alt-active', value === 'card');
-		this._cash.classList.toggle('button_alt-active', value === 'cash');
 	}
 }
