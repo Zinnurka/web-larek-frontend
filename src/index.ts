@@ -149,9 +149,9 @@ function handleFormErrorsChange(errors: any) {
 
 // блокировка и разблокировка прокрутки страницы
 emitter.on('modal:open', () => {
-	page.locked = true;
+	page.disable = true;
 });
 
 emitter.on('modal:close', () => {
-	page.locked = false;
+	page.disable = false;
 });
