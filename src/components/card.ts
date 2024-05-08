@@ -14,13 +14,13 @@ export class Card extends Component<IProduct> {
 	protected _price: HTMLElement;
 	protected _button?: HTMLButtonElement;
 
-	protected _categoryColor = new Map<string, string>([
-		['софт-скил', '_soft'],
-		['другое', '_other'],
-		['дополнительное', '_additional'],
-		['кнопка', '_button'],
-		['хард-скил', '_hard'],
-	]);
+	protected categoryMap: { [key: string]: string } = {
+		'софт-скил': 'card__category_soft',
+		'другое': 'card__category_other',
+		'хард-скил': 'card__category_hard',
+		'дополнительное': 'card__category_additional',
+		'кнопка': 'card__category_button',
+	};
 
 	constructor(container: HTMLElement, actions?: ICardActions) {
 		super(container);
@@ -66,16 +66,11 @@ export class Card extends Component<IProduct> {
 		return this._price.textContent || '';
 	}
 
-	set price(value: string) {
-		if (value) {
-			this.setText(this._price, `${value} синапсов`);
-		} else {
-			this.setText(this._price, 'Бесценно');
-		}
-
-		if (this._button) {
-			this._button.disabled = !value;
-		}
+	set price(value: string | null) {
+		this.setText(
+			this._price,
+			value ? `${value.toString()} синапсов` : 'Бесценно'
+		);
 	}
 
 	get category(): string {
@@ -84,15 +79,16 @@ export class Card extends Component<IProduct> {
 
 	set category(value: string) {
 		this.setText(this._category, value);
-		this._category?.classList?.remove('card__category_soft');
-		this._category?.classList?.remove('card__category_other');
-		this._category?.classList?.add(
-			`card__category${this._categoryColor.get(value)}`
+		this._category?.classList?.add(this.categoryMap[value]
 		);
 	}
 
 	set description(value: string) {
-		this.setText(this._description, value);
+		if (value) {
+			this.setText(this._description, value);
+		} else {
+			this._description?.remove();
+		}
 	}
 
 	set button(value: string) {
