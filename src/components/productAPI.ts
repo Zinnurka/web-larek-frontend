@@ -15,23 +15,17 @@ export class productAPI extends Api implements IProductAPI {
 		this.cdn = cdn;
 	}
 
-	getProducts(): Promise<IProduct[]> {
-		return this.get('/product').then((data: ApiListResponse<IProduct>) =>
-			data.items.map((item) => ({
-				...item,
-				image: this.cdn + item.image,
-			}))
-		);
-	}
-
-	getProduct(id: string): Promise<IProduct> {
-		return this.get(`/product/${id}`).then((item: IProduct) => ({
+	getProducts = (): Promise<IProduct[]> => this.get('/product').then((data: ApiListResponse<IProduct>) =>
+		data.items.map((item) => ({
 			...item,
 			image: this.cdn + item.image,
-		}));
-	}
+		}))
+	);
 
-	order(order: IOrder): Promise<IOrderResult> {
-		return this.post('/order', order).then((data: IOrderResult) => data);
-	}
+	getProduct = (id: string): Promise<IProduct> => this.get(`/product/${id}`).then((item: IProduct) => ({
+		...item,
+		image: this.cdn + item.image,
+	}));
+
+	order = (order: IOrder): Promise<IOrderResult> => this.post('/order', order).then((data: IOrderResult) => data);
 }

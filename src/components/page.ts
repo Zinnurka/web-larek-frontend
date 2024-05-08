@@ -17,11 +17,18 @@ export class Page extends View<IPage> {
 	constructor(container: HTMLElement, events: IEvents) {
 		super(container, events);
 
-		this._counter = ensureElement<HTMLElement>('.header__basket-counter');
-		this._catalog = ensureElement<HTMLElement>('.gallery');
-		this._wrapper = ensureElement<HTMLElement>('.page__wrapper');
-		this._basket = ensureElement<HTMLElement>('.header__basket');
+		this._initializeElements();
+		this._setupEventListeners();
+	}
 
+	private _initializeElements(): void {
+		this._counter = ensureElement<HTMLElement>('.header__basket-counter', this.container);
+		this._catalog = ensureElement<HTMLElement>('.gallery', this.container);
+		this._wrapper = ensureElement<HTMLElement>('.page__wrapper', this.container);
+		this._basket = ensureElement<HTMLElement>('.header__basket', this.container);
+	}
+
+	private _setupEventListeners(): void {
 		this._basket.addEventListener('click', () => {
 			this.events.emit('basket:open');
 		});
@@ -36,10 +43,6 @@ export class Page extends View<IPage> {
 	}
 
 	set locked(value: boolean) {
-		if (value) {
-			this._wrapper.classList.add('page__wrapper_locked');
-		} else {
-			this._wrapper.classList.remove('page__wrapper_locked');
-		}
+		this._wrapper.classList.toggle('page__wrapper_locked', value);
 	}
 }
