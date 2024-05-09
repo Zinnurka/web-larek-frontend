@@ -39,24 +39,24 @@ api
 
 emitter.on('items:change', handlerItemChange);
 
-emitter.on('card:select', handleCardSelect);
+emitter.on('card:select', handlerCardSelect);
 
-emitter.on('preview:change', handlePreviewChange);
+emitter.on('preview:change', handlerPreviewChange);
 
-emitter.on('basket:change', handleBasketChange);
+emitter.on('basket:change', handlerBasketChange);
 
-emitter.on('basket:open', handleBasketOpen);
+emitter.on('basket:open', handlerBasketOpen);
 
-emitter.on('order:open', handleOrderOpen);
+emitter.on('order:open', handlerOrderOpen);
 
 emitter.on(/^order\..*:change/, (data) => handleFormChange(data, order));
 emitter.on(/^contacts\..*:change/, (data) => handleFormChange(data, contacts));
 
-emitter.on('formErrors:change', handleFormErrorsChange);
+emitter.on('formErrors:change', handlerFormErrorsChange);
 
-emitter.on('contacts:submit', handleContactSubmit);
+emitter.on('contacts:submit', handlerContactSubmit);
 
-emitter.on('order:submit', handleOrderSubmit );
+emitter.on('order:submit', handlerOrderSubmit );
 
 function getClonedTemplate(template: HTMLTemplateElement): HTMLFormElement {
 	return cloneTemplate(template);
@@ -67,7 +67,7 @@ function showModal(content: any) {
 	modal.open();
 }
 
-function handleBasketChange() {
+function handlerBasketChange() {
 	page.counter = appState.basket.items.length;
 
 	basket.items = appState.basket.items.map((id) => {
@@ -85,13 +85,13 @@ function handleFormChange(data:any , target:any ) {
 	appState.setOrderField(data.field, data.value);
 }
 
-function handleFormErrorsChange(errors: any) {
+function handlerFormErrorsChange(errors: any) {
 	const { payment, address, email, phone } = errors;
 	order.valid = !payment && !address;
 	contacts.valid = !email && !phone;
 }
 
-function handleOrderOpen(){
+function handlerOrderOpen(){
 	showModal(order.render({
 		payment: 'card',
 		address: '',
@@ -100,7 +100,7 @@ function handleOrderOpen(){
 	}));
 }
 
-function handleOrderSubmit(){
+function handlerOrderSubmit(){
 	showModal(contacts.render({
 		phone: '',
 		email: '',
@@ -109,7 +109,7 @@ function handleOrderSubmit(){
 	}));
 }
 
-function handleContactSubmit(){
+function handlerContactSubmit(){
 	api
 		.order(appState.order)
 		.then(() => {
@@ -117,7 +117,7 @@ function handleContactSubmit(){
 				onClick: () => {
 					modal.close();
 					appState.clearBasket();
-					handleBasketChange();
+					handlerBasketChange();
 				},
 			});
 			showModal(success.render({ total: appState.order.total }));
@@ -127,11 +127,11 @@ function handleContactSubmit(){
 		});
 }
 
-function handleBasketOpen (){
+function handlerBasketOpen (){
 	showModal(basket.render());
 }
 
-function handleCardSelect(item:IProduct){
+function handlerCardSelect(item:IProduct){
 	appState.setPreview(item);
 }
 
@@ -144,7 +144,7 @@ function handlerItemChange (items: IProduct[]){
 	});
 }
 
-function handlePreviewChange (item: IProduct){
+function handlerPreviewChange (item: IProduct){
 	const card = new Card(getClonedTemplate(cardPreviewTemplate), {
 		onClick: () => {
 			if (item.price === null){
