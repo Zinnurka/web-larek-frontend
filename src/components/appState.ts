@@ -1,4 +1,10 @@
-import { IBasket, IOrder, IProduct, IDeliveryForm, PaymentMethod } from '../types';
+import {
+	IBasket,
+	IOrder,
+	IProduct,
+	IDeliveryForm,
+	PaymentMethod,
+} from '../types';
 import { IEvents } from './base/events';
 
 export class AppState {
@@ -23,29 +29,29 @@ export class AppState {
 	}
 
 	isAddedToBasket(item: IProduct) {
-		const basketItems = this.basket.items
+		const basketItems = this.basket.items;
 		return basketItems.includes(item.id);
 	}
 
 	addInBasket(item: IProduct) {
 		this.basket.items.push(item.id);
-		this.basket.total = this.basket.total+ item.price;
-		this.updateBasket()
+		this.basket.total = this.basket.total + item.price;
+		this.updateBasket();
 	}
 
 	removeFromBasket(item: IProduct) {
 		this.basket.items = this.basket.items.filter((id) => id != item.id);
-		this.basket.total = this.basket.total-item.price;
-		this.updateBasket()
+		this.basket.total = this.basket.total - item.price;
+		this.updateBasket();
 	}
 
 	clearBasket() {
 		this.basket.items = [];
 		this.basket.total = 0;
-		this.updateBasket()
+		this.updateBasket();
 	}
 
-	updateBasket(){
+	updateBasket() {
 		this.events.emit('basket:change', this.basket);
 	}
 

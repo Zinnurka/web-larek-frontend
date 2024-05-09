@@ -13,7 +13,7 @@ export class Form<T extends Record<string, any>> extends View<IFormState> {
 
 	constructor(
 		protected container: HTMLFormElement,
-		protected events: EventEmitter
+		protected events: EventEmitter,
 	) {
 		super(container, events);
 		this._submit = ensureElement<HTMLButtonElement>('button[type=submit]', this.container);

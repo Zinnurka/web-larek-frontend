@@ -59,7 +59,7 @@ export class Card extends Component<IProduct> {
 	}
 
 	get buttonElement(): HTMLElement {
-		return this._button
+		return this._button;
 	}
 
 	set image(value: string) {
@@ -73,7 +73,7 @@ export class Card extends Component<IProduct> {
 	set price(value: string | null) {
 		this.setText(
 			this._price,
-			value ? `${value.toString()} синапсов` : 'Бесценно'
+			value ? `${value.toString()} синапсов` : 'Бесценно',
 		);
 	}
 
@@ -83,7 +83,7 @@ export class Card extends Component<IProduct> {
 
 	set category(value: string) {
 		this.setText(this._category, value);
-		this._category?.classList?.add(this.categoryMap[value]
+		this._category?.classList?.add(this.categoryMap[value],
 		);
 	}
 
