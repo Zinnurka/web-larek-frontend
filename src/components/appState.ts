@@ -3,23 +3,50 @@ import { IEvents } from './base/events';
 
 export class AppState {
 	items: IProduct[] = [];
+	order: IOrder = {
+		items: [],
+		email: '',
+		phone: '',
+		payment: 'card',
+		address: '',
+		total: 0,
+	};
 	basket: IBasket = {
 		items: [],
 		total: 0,
 	};
 	preview: IProduct = null;
-	order: IOrder = {
-		email: '',
-		phone: '',
-		address: '',
-		payment: 'card',
-		total: 0,
-		items: [],
-	};
 
 	formErrors: Partial<Record<keyof IDeliveryForm, string>> = {};
 
 	constructor(protected events: IEvents) {
+	}
+
+	isAddedToBasket(item: IProduct) {
+		const basketItems = this.basket.items
+		return basketItems.includes(item.id);
+	}
+
+	addInBasket(item: IProduct) {
+		this.basket.items.push(item.id);
+		this.basket.total = this.basket.total+ item.price;
+		this.updateBasket()
+	}
+
+	removeFromBasket(item: IProduct) {
+		this.basket.items = this.basket.items.filter((id) => id != item.id);
+		this.basket.total = this.basket.total-item.price;
+		this.updateBasket()
+	}
+
+	clearBasket() {
+		this.basket.items = [];
+		this.basket.total = 0;
+		this.updateBasket()
+	}
+
+	updateBasket(){
+		this.events.emit('basket:change', this.basket);
 	}
 
 	setItems(items: IProduct[]) {
@@ -30,29 +57,6 @@ export class AppState {
 	setPreview(item: IProduct) {
 		this.preview = item;
 		this.events.emit('preview:change', item);
-	}
-
-	isAddedToBasket(item: IProduct) {
-		const basketItems = this.basket.items
-		return basketItems.includes(item.id);
-	}
-
-	addInBasket(item: IProduct) {
-		this.basket.items.push(item.id);
-		this.basket.total += item.price;
-		this.events.emit('basket:change', this.basket);
-	}
-
-	removeFromBasket(item: IProduct) {
-		this.basket.items = this.basket.items.filter((id) => id != item.id);
-		this.basket.total -= item.price;
-		this.events.emit('basket:change', this.basket);
-	}
-
-	clearBasket() {
-		this.basket.items = [];
-		this.basket.total = 0;
-		this.events.emit('basket:change');
 	}
 
 	setPaymentMethod(method: PaymentMethod) {
