@@ -58,6 +58,10 @@ export class Card extends Component<IProduct> {
 		return this._title.textContent || '';
 	}
 
+	get buttonElement(): HTMLElement {
+		return this._button
+	}
+
 	set image(value: string) {
 		this.setImage(this._image, value, this.title);
 	}

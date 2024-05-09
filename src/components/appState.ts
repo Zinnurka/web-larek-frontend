@@ -1,7 +1,7 @@
 import { IBasket, IOrder, IProduct, IDeliveryForm, PaymentMethod } from '../types';
 import { IEvents } from './base/events';
 
-export class AppData {
+export class AppState {
 	items: IProduct[] = [];
 	basket: IBasket = {
 		items: [],
@@ -32,11 +32,12 @@ export class AppData {
 		this.events.emit('preview:change', item);
 	}
 
-	inBasket(item: IProduct) {
-		return this.basket.items.includes(item.id);
+	isAddedToBasket(item: IProduct) {
+		const basketItems = this.basket.items
+		return basketItems.includes(item.id);
 	}
 
-	addToBasket(item: IProduct) {
+	addInBasket(item: IProduct) {
 		this.basket.items.push(item.id);
 		this.basket.total += item.price;
 		this.events.emit('basket:change', this.basket);

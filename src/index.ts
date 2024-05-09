@@ -1,4 +1,4 @@
-import { AppData } from './components/appData';
+import { AppState } from './components/appState';
 import { Card } from './components/card';
 import { Contacts } from './components/contacts';
 import { Order } from './components/order';
@@ -24,7 +24,7 @@ const orderTemplate = ensureElement<HTMLTemplateElement>('#order');
 const contactsTemplate = ensureElement<HTMLTemplateElement>('#contacts');
 const successTemplate = ensureElement<HTMLTemplateElement>('#success');
 
-const appData = new AppData(emitter);
+const appState = new AppState(emitter);
 
 const modal = new Modal(ensureElement<HTMLElement>('#modal-container'), emitter);
 const basket = new Basket(emitter);
@@ -34,85 +34,29 @@ const page = new Page(container, emitter);
 
 api
 	.getProducts()
-	.then(appData.setItems.bind(appData))
+	.then(appState.setItems.bind(appState))
 	.catch((err) => console.log(err));
 
-emitter.on('items:change', (items: IProduct[]) => {
-	page.catalog = items.map((item) => {
-		const card = new Card(getClonedTemplate(cardCatalogTemplate), {
-			onClick: () => emitter.emit('card:select', item),
-		});
-		return card.render(item);
-	});
-});
+emitter.on('items:change', handlerItemChange);
 
-emitter.on('card:select', (item: IProduct) => {
-	appData.setPreview(item);
-});
+emitter.on('card:select', handleCardSelect);
 
-emitter.on('preview:change', (item: IProduct) => {
-	const card = new Card(getClonedTemplate(cardPreviewTemplate), {
-		onClick: () => {
-			if (appData.inBasket(item)) {
-				appData.removeFromBasket(item);
-				card.button = 'В корзину';
-			} else {
-				appData.addToBasket(item);
-				card.button = 'Удалить из корзины';
-			}
-		},
-	});
-
-	card.button = appData.inBasket(item) ? 'Удалить из корзины' : 'В корзину';
-	showModal(card.render(item));
-});
+emitter.on('preview:change', handlePreviewChange);
 
 emitter.on('basket:change', handleBasketChange);
 
-emitter.on('basket:open', () => {
-	showModal(basket.render());
-});
+emitter.on('basket:open', handleBasketOpen);
 
-emitter.on('order:open', () => {
-	showModal(order.render({
-		payment: 'card',
-		address: '',
-		valid: false,
-		errors: [],
-	}));
-});
+emitter.on('order:open', handleOrderOpen);
 
 emitter.on(/^order\..*:change/, (data) => handleFormChange(data, order));
 emitter.on(/^contacts\..*:change/, (data) => handleFormChange(data, contacts));
 
 emitter.on('formErrors:change', handleFormErrorsChange);
 
-emitter.on('contacts:submit', () => {
-	api
-		.order(appData.order)
-		.then(() => {
-			const success = new Success(getClonedTemplate(successTemplate), {
-				onClick: () => {
-					modal.close();
-					appData.clearBasket();
-					handleBasketChange();
-				},
-			});
-			showModal(success.render({ total: appData.order.total }));
-		})
-		.catch((err) => {
-			console.error(err);
-		});
-});
+emitter.on('contacts:submit', handleContactSubmit);
 
-emitter.on('order:submit', () => {
-	showModal(contacts.render({
-		phone: '',
-		email: '',
-		valid: false,
-		errors: [],
-	}));
-});
+emitter.on('order:submit', handleOrderSubmit );
 
 function getClonedTemplate(template: HTMLTemplateElement): HTMLFormElement {
 	return cloneTemplate(template);
@@ -124,21 +68,21 @@ function showModal(content: any) {
 }
 
 function handleBasketChange() {
-	page.counter = appData.basket.items.length;
+	page.counter = appState.basket.items.length;
 
-	basket.items = appData.basket.items.map((id) => {
-		const item = appData.items.find((item) => item.id === id);
+	basket.items = appState.basket.items.map((id) => {
+		const item = appState.items.find((item) => item.id === id);
 		const card = new Card(getClonedTemplate(cardBasketTemplate), {
-			onClick: () => appData.removeFromBasket(item),
+			onClick: () => appState.removeFromBasket(item),
 		});
 		return card.render(item);
 	});
 
-	basket.total = appData.basket.total;
+	basket.total = appState.basket.total;
 }
 
 function handleFormChange(data:any , target:any ) {
-	appData.setOrderField(data.field, data.value);
+	appState.setOrderField(data.field, data.value);
 }
 
 function handleFormErrorsChange(errors: any) {
@@ -147,7 +91,80 @@ function handleFormErrorsChange(errors: any) {
 	contacts.valid = !email && !phone;
 }
 
-// блокировка и разблокировка прокрутки страницы
+function handleOrderOpen(){
+	showModal(order.render({
+		payment: 'card',
+		address: '',
+		valid: false,
+		errors: [],
+	}));
+}
+
+function handleOrderSubmit(){
+	showModal(contacts.render({
+		phone: '',
+		email: '',
+		valid: false,
+		errors: [],
+	}));
+}
+
+function handleContactSubmit(){
+	api
+		.order(appState.order)
+		.then(() => {
+			const success = new Success(getClonedTemplate(successTemplate), {
+				onClick: () => {
+					modal.close();
+					appState.clearBasket();
+					handleBasketChange();
+				},
+			});
+			showModal(success.render({ total: appState.order.total }));
+		})
+		.catch((err) => {
+			console.error(err);
+		});
+}
+
+function handleBasketOpen (){
+	showModal(basket.render());
+}
+
+function handleCardSelect(item:IProduct){
+	appState.setPreview(item);
+}
+
+function handlerItemChange (items: IProduct[]){
+	page.catalog = items.map((item) => {
+		const card = new Card(getClonedTemplate(cardCatalogTemplate), {
+			onClick: () => emitter.emit('card:select', item),
+		});
+		return card.render(item);
+	});
+}
+
+function handlePreviewChange (item: IProduct){
+	const card = new Card(getClonedTemplate(cardPreviewTemplate), {
+		onClick: () => {
+			if (item.price === null){
+				card.setDisabled(card.buttonElement, true)
+				card.button = 'Недоступно'
+			}
+			else if (appState.isAddedToBasket(item)) {
+				appState.removeFromBasket(item);
+				card.button = 'В корзину';
+			} else {
+				appState.addInBasket(item);
+				card.button = 'Удалить из корзины';
+			}
+		},
+	});
+
+	card.button = appState.isAddedToBasket(item) ? 'Удалить из корзины' : 'В корзину';
+	showModal(card.render(item));
+}
+
 emitter.on('modal:open', () => {
 	page.disable = true;
 });
