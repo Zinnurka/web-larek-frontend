@@ -17,6 +17,7 @@ export interface IBasket {
 export type PaymentMethod = 'cash' | 'card';
 
 export interface IOrder {
+
 	payment: PaymentMethod;
 	email: string;
 	phone: string;

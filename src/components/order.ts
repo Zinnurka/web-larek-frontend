@@ -1,4 +1,4 @@
-import { Form } from './common/Form';
+import { Form } from './common/form';
 import { IDeliveryForm } from '../types';
 import { EventEmitter } from './base/events';
 import { ensureElement } from '../utils/utils';

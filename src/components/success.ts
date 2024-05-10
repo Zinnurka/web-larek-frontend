@@ -1,5 +1,5 @@
 import { ISuccess, ISuccessActions } from '../types';
-import { Component } from './base/Component';
+import { Component } from './base/component';
 
 export class Success extends Component<ISuccess> {
 	protected _closeButton: HTMLButtonElement;
