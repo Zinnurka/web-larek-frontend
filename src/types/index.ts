@@ -1,10 +1,10 @@
-export interface IProduct {
+export interface ISuccess {
 	id: string;
-	description: string;
-	image: string;
-	title: string;
-	category: string;
-	price: number | null;
+	total: number;
+}
+
+export interface ISuccessActions {
+	onClick: (event: MouseEvent) => void;
 }
 
 export type FormErrors = Partial<Record<keyof IOrder, string>>;
@@ -27,8 +27,11 @@ export interface IOrder {
 
 export type IDeliveryForm = Omit<IOrder, 'total' | 'items'>;
 
-export interface IOrderResult {
+export interface IProduct {
 	id: string;
-	total: number;
+	description: string;
+	image: string;
+	title: string;
+	category: string;
+	price: number | null;
 }
-

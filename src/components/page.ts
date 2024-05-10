@@ -29,6 +29,10 @@ export class Page extends View<IPage> {
 		});
 	}
 
+	set disable(value: boolean) {
+		this._wrapper.classList.toggle('page__wrapper_locked', value);
+	}
+
 	set counter(value: number) {
 		this.setText(this._counter, String(value));
 	}
@@ -37,7 +41,5 @@ export class Page extends View<IPage> {
 		this._catalog.replaceChildren(...items);
 	}
 
-	set disable(value: boolean) {
-		this._wrapper.classList.toggle('page__wrapper_locked', value);
-	}
+
 }

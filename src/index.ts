@@ -157,18 +157,18 @@ function handlerPreviewChange(item: IProduct) {
 		onClick: () => {
 			if (item.price === null) {
 				card.setDisabled(card.buttonElement, true);
-				card.button = 'Недоступно';
+				card.buttonTitle = 'Недоступно';
 			} else if (appState.isAddedToBasket(item)) {
 				appState.removeFromBasket(item);
-				card.button = 'В корзину';
+				card.buttonTitle = 'В корзину';
 			} else {
 				appState.addInBasket(item);
-				card.button = 'Удалить из корзины';
+				card.buttonTitle = 'Удалить из корзины';
 			}
 		},
 	});
 
-	card.button = appState.isAddedToBasket(item) ? 'Удалить из корзины' : 'В корзину';
+	card.buttonTitle = appState.isAddedToBasket(item) ? 'Удалить из корзины' : 'В корзину';
 	showModal(card.render(item));
 }
 
