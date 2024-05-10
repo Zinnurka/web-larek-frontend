@@ -3,29 +3,34 @@ import {
 	IOrder,
 	IProduct,
 	IDeliveryForm,
-	PaymentMethod,
+	PaymentMethod, FormErrors,
 } from '../types';
 import { IEvents } from './base/events';
 
 export class AppState {
 	items: IProduct[] = [];
-	order: IOrder = {
-		items: [],
-		email: '',
-		phone: '',
-		payment: 'card',
-		address: '',
-		total: 0,
-	};
-	basket: IBasket = {
-		items: [],
-		total: 0,
-	};
+	order: IOrder;
+	formErrors: FormErrors = {};
+	basket: IBasket;
 	preview: IProduct = null;
 
-	formErrors: Partial<Record<keyof IDeliveryForm, string>> = {};
-
 	constructor(protected events: IEvents) {
+		this.clearOrderAndBasket()
+	}
+
+	clearOrderAndBasket() {
+		this.order = {
+			items: [],
+			email: '',
+			phone: '',
+			payment: 'card',
+			address: '',
+			total: 0,
+		}
+		this.basket = {
+			items: [],
+			total: 0,
+		}
 	}
 
 	isAddedToBasket(item: IProduct) {

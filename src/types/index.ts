@@ -7,6 +7,8 @@ export interface IProduct {
 	price: number | null;
 }
 
+export type FormErrors = Partial<Record<keyof IOrder, string>>;
+
 export interface IBasket {
 	items: string[];
 	total: number;
@@ -29,3 +31,4 @@ export interface IOrderResult {
 	id: string;
 	total: number;
 }
+
