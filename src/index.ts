@@ -137,6 +137,13 @@ function handlerContactSubmit() {
 
 function handlerBasketOpen() {
 	showModal(basket.render());
+	basket.items = appState.basket.items.map((id) => {
+		const item = appState.items.find((item) => item.id === id);
+		const card = new Card(getClonedTemplate(cardBasketTemplate), {
+			onClick: () => appState.removeFromBasket(item),
+		});
+		return card.render(item);
+	});
 }
 
 function handlerCardSelect(item: IProduct) {
