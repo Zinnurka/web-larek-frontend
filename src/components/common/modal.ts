@@ -1,4 +1,4 @@
-import { View } from '../base/Component';
+import { View } from '../base/component';
 import { ensureElement } from '../../utils/utils';
 import { IEvents } from '../base/events';
 
@@ -13,29 +13,39 @@ export class Modal extends View<IModalData> {
 	constructor(container: HTMLElement, protected events: IEvents) {
 		super(container, events);
 
-		this._closeButton = ensureElement<HTMLButtonElement>(
-			'.modal__close',
-			container
-		);
-		this._content = ensureElement<HTMLElement>('.modal__content', container);
+		this._initializeElements();
+		this._setupEventListeners();
+	}
 
+	private _initializeElements(): void {
+		this._closeButton = ensureElement<HTMLButtonElement>('.modal__close', this.container);
+		this._content = ensureElement<HTMLElement>('.modal__content', this.container);
+	}
+
+	private _setupEventListeners(): void {
 		this._closeButton.addEventListener('click', this.close.bind(this));
 		this.container.addEventListener('click', this.close.bind(this));
+
+		// Prevent modal from closing when clicking inside the content area
 		this._content.addEventListener('click', (event) => event.stopPropagation());
 	}
 
 	set content(value: HTMLElement) {
-		this._content.replaceChildren(value);
+		// Replace the modal content safely and clear if necessary
+		if (value) {
+			this._content.replaceChildren(value);
+		} else {
+			this._content.innerHTML = '';  // Clear content when null
+		}
 	}
 
-	open() {
+	open(): void {
 		this.container.classList.add('modal_active');
 		this.events.emit('modal:open');
 	}
 
-	close() {
+	close(): void {
 		this.container.classList.remove('modal_active');
-		this.content = null;
 		this.events.emit('modal:close');
 	}
 }

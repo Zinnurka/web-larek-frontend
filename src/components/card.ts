@@ -1,26 +1,25 @@
 import { IProduct } from '../types';
 import { ensureElement } from '../utils/utils';
-import { Component } from './base/Component';
+import { Component } from './base/component';
 
 interface ICardActions {
 	onClick: (event: MouseEvent) => void;
 }
 
 export class Card extends Component<IProduct> {
+	protected _price: HTMLElement;
 	protected _category?: HTMLElement;
 	protected _title: HTMLElement;
 	protected _image?: HTMLImageElement;
+	protected _buttonTitle?: HTMLButtonElement;
 	protected _description?: HTMLElement;
-	protected _price: HTMLElement;
-	protected _button?: HTMLButtonElement;
-
-	protected _categoryColor = new Map<string, string>([
-		['софт-скил', '_soft'],
-		['другое', '_other'],
-		['дополнительное', '_additional'],
-		['кнопка', '_button'],
-		['хард-скил', '_hard'],
-	]);
+	protected categoryMap: { [key: string]: string } = {
+		'софт-скил': 'card__category_soft',
+		'другое': 'card__category_other',
+		'хард-скил': 'card__category_hard',
+		'дополнительное': 'card__category_additional',
+		'кнопка': 'card__category_button',
+	};
 
 	constructor(container: HTMLElement, actions?: ICardActions) {
 		super(container);
@@ -28,14 +27,14 @@ export class Card extends Component<IProduct> {
 		this._title = ensureElement<HTMLElement>('.card__title', container);
 		this._price = ensureElement<HTMLElement>('.card__price', container);
 
-		this._category = container.querySelector(`.card__category`);
-		this._image = container.querySelector(`.card__image`);
 		this._description = container.querySelector(`.card__description`);
-		this._button = container.querySelector(`.card__button`);
+		this._category = container.querySelector(`.card__category`);
+		this._buttonTitle = container.querySelector(`.card__button`);
+		this._image = container.querySelector(`.card__image`);
 
 		if (actions?.onClick) {
-			if (this._button) {
-				this._button.addEventListener('click', actions.onClick);
+			if (this._buttonTitle) {
+				this._buttonTitle.addEventListener('click', actions.onClick);
 			} else {
 				container.addEventListener('click', actions.onClick);
 			}
@@ -50,6 +49,10 @@ export class Card extends Component<IProduct> {
 		return this.container.dataset.id || '';
 	}
 
+	set buttonTitle(value: string) {
+		this.setText(this._buttonTitle, value);
+	}
+
 	set title(value: string) {
 		this.setText(this._title, value);
 	}
@@ -58,24 +61,12 @@ export class Card extends Component<IProduct> {
 		return this._title.textContent || '';
 	}
 
+	get buttonElement(): HTMLElement {
+		return this._buttonTitle;
+	}
+
 	set image(value: string) {
 		this.setImage(this._image, value, this.title);
-	}
-
-	get price(): string {
-		return this._price.textContent || '';
-	}
-
-	set price(value: string) {
-		if (value) {
-			this.setText(this._price, `${value} синапсов`);
-		} else {
-			this.setText(this._price, 'Бесценно');
-		}
-
-		if (this._button) {
-			this._button.disabled = !value;
-		}
 	}
 
 	get category(): string {
@@ -84,18 +75,27 @@ export class Card extends Component<IProduct> {
 
 	set category(value: string) {
 		this.setText(this._category, value);
-		this._category?.classList?.remove('card__category_soft');
-		this._category?.classList?.remove('card__category_other');
-		this._category?.classList?.add(
-			`card__category${this._categoryColor.get(value)}`
+		this._category?.classList?.add(this.categoryMap[value],
+		);
+	}
+
+	get price(): number {
+		return Number(this._price.textContent || '');
+	}
+
+	set price(value: number | null) {
+		this.setText(
+			this._price,
+			value ? `${value.toString()} синапсов` : 'Бесценно',
 		);
 	}
 
 	set description(value: string) {
-		this.setText(this._description, value);
+		if (value) {
+			this.setText(this._description, value);
+		} else {
+			this._description?.remove();
+		}
 	}
 
-	set button(value: string) {
-		this.setText(this._button, value);
-	}
 }

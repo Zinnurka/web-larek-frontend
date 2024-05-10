@@ -1,25 +1,63 @@
-import { IBasket, IOrder, IProduct, OrderForm, PaymentMethod } from '../types';
+import {
+	IBasket,
+	IOrder,
+	IProduct,
+	IDeliveryForm,
+	PaymentMethod, FormErrors,
+} from '../types';
 import { IEvents } from './base/events';
 
-export class AppData {
+export class AppState {
 	items: IProduct[] = [];
-	basket: IBasket = {
-		items: [],
-		total: 0,
-	};
+	order: IOrder;
+	formErrors: FormErrors = {};
+	basket: IBasket;
 	preview: IProduct = null;
-	order: IOrder = {
-		email: '',
-		phone: '',
-		address: '',
-		payment: 'card',
-		total: 0,
-		items: [],
-	};
-
-	formErrors: Partial<Record<keyof OrderForm, string>> = {};
 
 	constructor(protected events: IEvents) {
+		this.clearOrderAndBasket()
+	}
+
+	clearOrderAndBasket() {
+		this.order = {
+			items: [],
+			email: '',
+			phone: '',
+			payment: 'card',
+			address: '',
+			total: 0,
+		}
+		this.basket = {
+			items: [],
+			total: 0,
+		}
+	}
+
+	isAddedToBasket(item: IProduct) {
+		const basketItems = this.basket.items;
+		return basketItems.includes(item.id);
+	}
+
+	addInBasket(item: IProduct) {
+		this.basket.items.push(item.id);
+		this.basket.total = this.basket.total + item.price;
+		this.updateBasket();
+	}
+
+	removeFromBasket(item: IProduct) {
+		this.basket.items = this.basket.items.filter((id) => id != item.id);
+		this.basket.total = this.basket.total - item.price;
+		this.updateBasket();
+	}
+
+	clearBasket() {
+		this.basket.items = [];
+		this.basket.total = 0;
+		this.updateBasket();
+	}
+
+	updateBasket() {
+		this.events.emit('basket:change', this.basket);
 	}
 
 	setItems(items: IProduct[]) {
@@ -32,33 +70,11 @@ export class AppData {
 		this.events.emit('preview:change', item);
 	}
 
-	inBasket(item: IProduct) {
-		return this.basket.items.includes(item.id);
-	}
-
-	addToBasket(item: IProduct) {
-		this.basket.items.push(item.id);
-		this.basket.total += item.price;
-		this.events.emit('basket:change', this.basket);
-	}
-
-	removeFromBasket(item: IProduct) {
-		this.basket.items = this.basket.items.filter((id) => id != item.id);
-		this.basket.total -= item.price;
-		this.events.emit('basket:change', this.basket);
-	}
-
-	clearBasket() {
-		this.basket.items = [];
-		this.basket.total = 0;
-		this.events.emit('basket:change');
-	}
-
 	setPaymentMethod(method: PaymentMethod) {
 		this.order.payment = method;
 	}
 
-	setOrderField(field: keyof OrderForm, value: string) {
+	setOrderField(field: keyof IDeliveryForm, value: string) {
 		if (field === 'payment') {
 			this.setPaymentMethod(value as PaymentMethod);
 		} else {

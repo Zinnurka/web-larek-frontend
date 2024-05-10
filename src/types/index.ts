@@ -1,11 +1,13 @@
-export interface IProduct {
+export interface ISuccess {
 	id: string;
-	description: string;
-	image: string;
-	title: string;
-	category: string;
-	price: number | null;
+	total: number;
 }
+
+export interface ISuccessActions {
+	onClick: (event: MouseEvent) => void;
+}
+
+export type FormErrors = Partial<Record<keyof IOrder, string>>;
 
 export interface IBasket {
 	items: string[];
@@ -15,6 +17,7 @@ export interface IBasket {
 export type PaymentMethod = 'cash' | 'card';
 
 export interface IOrder {
+
 	payment: PaymentMethod;
 	email: string;
 	phone: string;
@@ -23,9 +26,13 @@ export interface IOrder {
 	total: number;
 }
 
-export type OrderForm = Omit<IOrder, 'total' | 'items'>;
+export type IDeliveryForm = Omit<IOrder, 'total' | 'items'>;
 
-export interface IOrderResult {
+export interface IProduct {
 	id: string;
-	total: number;
+	description: string;
+	image: string;
+	title: string;
+	category: string;
+	price: number | null;
 }
