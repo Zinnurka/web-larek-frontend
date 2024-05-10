@@ -22,7 +22,6 @@ export class Basket extends View<IBasket> {
 	}
 
 	set selected(items: string[]) {
-		// Упрощение установки доступности кнопки
 		this.setDisabled(this._button, items.length === 0);
 	}
 
